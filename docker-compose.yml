@@ -1,36 +1,13 @@
 version: '3.8'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: movio-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: movio
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3307:3306"
-    volumes:
-      - movio_mysql_data:/var/lib/mysql
-    networks:
-      - movio-network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   backend:
     build: ./backend
     container_name: movio-backend
     restart: unless-stopped
-    depends_on:
-      mysql:
-        condition: service_healthy
     environment:
-      DB_HOST: mysql
+      DB_HOST: ${DB_HOST}
       DB_PORT: 3306
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -55,6 +32,3 @@ services:
 networks:
   movio-network:
     driver: bridge
-
-volumes:
-  movio_mysql_data:
